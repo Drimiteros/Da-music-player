@@ -12,7 +12,7 @@ Simple stuff!
 ## 🛠️ Tech Stack  
 - **C++ 17 and above**  
 - **SFML 2.6.0**
-- **Visual Studio**
+- **Visual Studio 2022**
 
 ---
 
