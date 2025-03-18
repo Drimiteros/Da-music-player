@@ -11,7 +11,8 @@ Simple stuff!
 
 ## 🛠️ Tech Stack  
 - **C++ 17 and above**  
-- **SFML 2.6.0**  
+- **SFML 2.6.0**
+- **Visual Studio
 
 ---
 
