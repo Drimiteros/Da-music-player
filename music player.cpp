@@ -10,7 +10,7 @@ using namespace sf;
 int main()
 {
     string version = "Da music player v.1.1_2";
-    RenderWindow window(VideoMode(1000, 900), version);
+    RenderWindow window(VideoMode(1000, 750), version);
     Event event;
 
     Texture play_button_texture;
