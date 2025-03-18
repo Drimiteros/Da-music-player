@@ -9,7 +9,8 @@ using namespace sf;
 
 int main()
 {
-    RenderWindow window(VideoMode(1000, 900), "Da music player");
+    string version = "Da music player v.1.1_2";
+    RenderWindow window(VideoMode(1000, 900), version);
     Event event;
 
     Texture play_button_texture;
@@ -38,27 +39,34 @@ int main()
     }
 
     vector<Text> directory_text_vector;
-    vector<string> file_paths;  // Store actual file paths separately
+    vector<string> file_paths; 
     Text directory_text;
     directory_text.setFont(font);
     directory_text.setCharacterSize(15);
     directory_text.setFillColor(Color(65, 65, 65));
-
     Text file_path_text;
     file_path_text.setCharacterSize(15);
     file_path_text.setFont(font);
     file_path_text.setPosition(5, 5);
     file_path_text.setFillColor(Color(255, 220, 155));
+    Text file_info_text;
+    file_info_text.setCharacterSize(15);
+    file_info_text.setFont(font);
+    file_info_text.setPosition(5, 650);
+    file_info_text.setFillColor(Color(255, 255, 255));
+    file_info_text.setString("Now playing:\nFile size:\nDuration:");
 
     Clock clock;
     Clock clock2;
     string file_path;
+    vector<string>file_name;
+    vector<float>file_size;
     bool stop_search = true;
 
-    // Sound storage
     SoundBuffer soundBuffer;
     Sound sound;
     float sound_offset = 0;
+    float sound_duration = 0;
 
     RectangleShape view;
     view.setSize(Vector2f(1000, 500));
@@ -66,7 +74,7 @@ int main()
     float height = 0;
     RectangleShape select_bar;
     select_bar.setSize(Vector2f(1000, 20));
-    select_bar.setFillColor(Color(100, 100, 255));
+    select_bar.setFillColor(Color(70, 70, 255));
     select_bar.setPosition(99999, 99999);
     RectangleShape cursor;
     cursor.setSize(Vector2f(1, 1));
@@ -78,13 +86,19 @@ int main()
     line[2].setSize(Vector2f(2, 20));
     line[2].setPosition(0, 5);
     line[2].setFillColor(Color(255, 220, 155));
+    RectangleShape timestamp_bar;
+    timestamp_bar.setSize(Vector2f(1000, 20));
+    timestamp_bar.setPosition(10, 725);
+    timestamp_bar.setFillColor(Color(70, 70, 255));
+    RectangleShape timestamp_bar_max;
+    timestamp_bar_max.setPosition(5, 720);
+    timestamp_bar_max.setFillColor(Color(255, 255, 255));
 
 
     while (window.isOpen()) {
         while (window.pollEvent(event)) {
-            if (event.type == Event::Closed) {
+            if (event.type == Event::Closed)
                 window.close();
-            }
             if (event.type == Event::TextEntered && !Keyboard::isKeyPressed(Keyboard::BackSpace) && !Keyboard::isKeyPressed(Keyboard::Enter))
                 file_path += event.text.unicode;
             if (event.type == Event::TextEntered && Keyboard::isKeyPressed(Keyboard::BackSpace) && !Keyboard::isKeyPressed(Keyboard::Enter))
@@ -147,12 +161,20 @@ int main()
         if (clock2.getElapsedTime().asSeconds() >= 1)
             clock2.restart();
 
+        if (sound.getStatus() == sound.Playing)
+            timestamp_bar.setSize(Vector2f(((sound.getPlayingOffset().asSeconds() * 1) / soundBuffer.getDuration().asSeconds()) * 180, 10));
+        else
+            timestamp_bar.setSize(Vector2f(180, 10));
+        timestamp_bar_max.setSize(Vector2f(190, 20));
+
         if (!stop_search) {
             file_paths.clear();
             directory_text_vector.clear();
             try {
                 for (const auto& entry : filesystem::directory_iterator(file_path)) {
                     string full_path = entry.path().string(); 
+                    file_name.push_back(entry.path().filename().string());
+                    file_size.push_back(entry.file_size());
                     file_paths.push_back(full_path);
 
                     Text temp_text = directory_text;
@@ -175,6 +197,9 @@ int main()
         window.draw(play_button);
         window.draw(next_button);
         window.draw(prev_button);
+        window.draw(file_info_text);
+        window.draw(timestamp_bar_max);
+        window.draw(timestamp_bar);
 
         for (int i = 0; i < directory_text_vector.size(); i++) {
             directory_text_vector[i].setPosition(5, 45 + height + (i * 20));
@@ -185,8 +210,9 @@ int main()
                     string selected_file = file_paths[i];
                     if (soundBuffer.loadFromFile(selected_file)) {
                         sound.setBuffer(soundBuffer);
+                        sound_duration = soundBuffer.getDuration().asSeconds();
+                        file_info_text.setString("Now playing: " + file_name[i] + "\nFile size: " + to_string(file_size[i] / 1048576).substr(0, 5) + " Mb" + "\nDuration: " + to_string(sound_duration).substr(0, 5) + " sec");
                         sound.play();
-                        cout << "Playing: " << selected_file << endl;
                     }
                 }
                 window.draw(select_bar);
