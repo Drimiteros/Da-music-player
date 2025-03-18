@@ -9,6 +9,13 @@ Simple stuff!
 
 ---
 
+## 💁 How to use:
+1. **Type a directory in the top menu.**
+2. **Select the audio file you want to play with your mouse.**
+3. **Use the symbols to control playback.**
+
+---
+
 ## 🛠️ Tech Stack  
 - **C++ 17 and above**  
 - **SFML 2.6.0**
