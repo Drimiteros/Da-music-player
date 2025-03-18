@@ -2,8 +2,8 @@
 
 A simple, retro, music player built in C++ that allows you to:  
 ✅ Search directories for music files  
-✅ Control playback 
-✅ View timestamps  
+✅ Control playback  
+✅ View timestamps 
 
 Simple stuff!  
 
