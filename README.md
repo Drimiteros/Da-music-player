@@ -1,8 +1,8 @@
 # Da Music Player 🎵  
 
-A simple music player built in C++ that allows you to:  
+A simple, retro, music player built in C++ that allows you to:  
 ✅ Search directories for music files  
-✅ Play and stop music  
+✅ Control playback 
 ✅ View timestamps  
 
 Simple stuff!  
