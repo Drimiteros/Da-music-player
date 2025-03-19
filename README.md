@@ -1,4 +1,4 @@
-# Da Music Player 🎵  
+# Da Music Player (v.2.1) 🎵  
 
 A simple, retro, music player built in C++ that allows you to:  
 ✅ Search directories for music files  
