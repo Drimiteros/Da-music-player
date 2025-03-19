@@ -12,7 +12,8 @@ Simple stuff!
 ## 💁 How to use:
 1. **Type a directory in the top menu and press enter.**
 2. **Select the audio file you want to play with your mouse.**
-3. **Use the symbols to control playback.**
+3. **Use the arrow keys to go up-down the track list**
+4. **Use the symbols to control playback.**
 
 ---
 
