@@ -7,7 +7,7 @@ A simple, retro, music player built in C++ that allows you to:
 
 Simple stuff!  
 
-![Uploading Screenshot_2.png…]()
+![Screenshot_2](https://github.com/user-attachments/assets/23647709-7f5f-44d9-813a-9375e4e1f196)
 
 ---
 
