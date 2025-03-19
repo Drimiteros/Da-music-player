@@ -10,7 +10,7 @@ using namespace sf;
 
 int main()
 {
-    string version = "Da music player v.1.2";
+    string version = "Da music player v.2.0";
     RenderWindow window(VideoMode(995, 747), version, Style::Close);
     Event event;
 
@@ -45,6 +45,13 @@ int main()
     Font font;
     font.loadFromFile("src/Fonts/font.ttf");
 
+    Clock clock;
+    Clock clock2;
+    string file_path = load_file_path;
+    vector<string>file_name;
+    vector<float>file_size;
+    bool stop_search = false;
+
     vector<Text> directory_text_vector;
     vector<string> file_paths;
     Text directory_text;
@@ -56,19 +63,13 @@ int main()
     file_path_text.setFont(font);
     file_path_text.setPosition(5, 5);
     file_path_text.setFillColor(Color(255, 220, 155));
+    file_path_text.setString(file_path);
     Text file_info_text;
     file_info_text.setCharacterSize(15);
     file_info_text.setFont(font);
     file_info_text.setPosition(5, 650);
     file_info_text.setFillColor(Color(255, 255, 255));
     file_info_text.setString("Now playing:\nFile size:\nDuration:");
-
-    Clock clock;
-    Clock clock2;
-    string file_path = load_file_path;
-    vector<string>file_name;
-    vector<float>file_size;
-    bool stop_search = false;
 
     SoundBuffer soundBuffer;
     Sound sound;
