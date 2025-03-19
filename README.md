@@ -3,7 +3,7 @@
 A simple, retro, music player built in C++ that allows you to:  
 ✅ Search directories for music files  
 ✅ Control playback  
-✅ View timestamps 
+✅ View timestamps and waveform
 
 Simple stuff!  
 
