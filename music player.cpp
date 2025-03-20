@@ -4,14 +4,14 @@
 #include <filesystem>
 #include <vector>
 #include <fstream>
+#include <Windows.h>
 
 using namespace std;
 using namespace sf;
 
-int main()
-{
-    string version = "Da music player v.2.0";
-    RenderWindow window(VideoMode(995, 747), version, Style::Close);
+int main() {
+    string version = "Da music player v.2.1";
+    RenderWindow window(VideoMode(995, 735), version, Style::Close);
     Event event;
 
     ifstream loadFile("src/Saves/save.txt");
@@ -23,6 +23,8 @@ int main()
         }
     }
 
+    int scroll_value = 0;
+
     Texture play_button_texture;
     Texture next_button_texture;
     Texture prev_button_texture;
@@ -32,15 +34,15 @@ int main()
     Sprite play_button;
     play_button.setTexture(play_button_texture);
     play_button.setScale(2, 2);
-    play_button.setPosition(5, 600);
+    play_button.setPosition(5, 588);
     Sprite prev_button;
     prev_button.setTexture(prev_button_texture);
     prev_button.setScale(2, 2);
-    prev_button.setPosition(55, 600);
+    prev_button.setPosition(60, 588);
     Sprite next_button;
     next_button.setTexture(next_button_texture);
     next_button.setScale(2, 2);
-    next_button.setPosition(125, 600);
+    next_button.setPosition(135, 588);
 
     Font font;
     font.loadFromFile("src/Fonts/font.ttf");
@@ -49,6 +51,8 @@ int main()
     Clock clock2;
     string file_path = load_file_path;
     vector<string>file_name;
+    string final_file_name;
+    float final_file_size = 0;
     vector<float>file_size;
     bool stop_search = false;
 
@@ -67,27 +71,29 @@ int main()
     Text file_info_text;
     file_info_text.setCharacterSize(15);
     file_info_text.setFont(font);
-    file_info_text.setPosition(5, 650);
+    file_info_text.setPosition(5, 638);
     file_info_text.setFillColor(Color(255, 255, 255));
     file_info_text.setString("Now playing:\nFile size:\nDuration:");
 
     SoundBuffer soundBuffer;
     Sound sound;
     float sound_offset = 0;
-    float sound_duration = 0;
+    int sound_duration = 0;
     VertexArray waveform(LineStrip, 770);
     const Int16* samples = nullptr;
     size_t sample_count = 0;
     size_t channel_count = 0;
     RectangleShape waveformArea;
     waveformArea.setSize(Vector2f(770, 142));
-    waveformArea.setPosition(220, 600);
+    waveformArea.setPosition(220, 588);
     waveformArea.setFillColor(Color(30, 30, 30));
     float scaleY = 0.003;
+    int remain_minutes = 0;
+    int remain_seconds = 0;
 
-    RectangleShape view;
-    view.setSize(Vector2f(1000, 500));
-    view.setPosition(0, 60);
+    RectangleShape view_bounds;
+    view_bounds.setSize(Vector2f(1000, 500));
+    view_bounds.setPosition(0, 60);
     float height = 0;
     RectangleShape select_bar;
     select_bar.setSize(Vector2f(1000, 20));
@@ -105,10 +111,10 @@ int main()
     line[2].setFillColor(Color(255, 220, 155));
     RectangleShape timestamp_bar;
     timestamp_bar.setSize(Vector2f(1000, 20));
-    timestamp_bar.setPosition(10, 725);
+    timestamp_bar.setPosition(10, 712);
     timestamp_bar.setFillColor(Color(255, 155, 55));
     RectangleShape timestamp_bar_max;
-    timestamp_bar_max.setPosition(5, 720);
+    timestamp_bar_max.setPosition(5, 707);
     timestamp_bar_max.setFillColor(Color(255, 255, 255));
 
     while (window.isOpen()) {
@@ -153,9 +159,22 @@ int main()
                 || (cursor.getGlobalBounds().intersects(play_button.getGlobalBounds()) && event.type == Event::MouseButtonPressed && Mouse::isButtonPressed(Mouse::Left)))
                 && sound.getStatus() == sound.Paused)
                 sound.play();
+
+            if (event.type == Event::MouseWheelScrolled) {
+                if (event.mouseWheelScroll.wheel == Mouse::VerticalWheel) {
+                    if (event.mouseWheelScroll.delta > 0)
+                        scroll_value++;
+                    if (event.mouseWheelScroll.delta < 0)
+                        scroll_value--;
+                }
+            }
         }
 
         cursor.setPosition(window.mapPixelToCoords(Vector2i(Mouse::getPosition(window).x, Mouse::getPosition(window).y)));
+        if (cursor.getGlobalBounds().intersects(timestamp_bar_max.getGlobalBounds()) && Mouse::isButtonPressed(Mouse::Left)) {
+            float playing_offset = ((cursor.getPosition().x - timestamp_bar.getPosition().x) / timestamp_bar_max.getLocalBounds().width) * soundBuffer.getDuration().asSeconds();
+            sound.setPlayingOffset(seconds(playing_offset));
+        }
 
         if (cursor.getGlobalBounds().intersects(play_button.getGlobalBounds()))
             play_button.setTextureRect(IntRect(20, 0, 20, 20));
@@ -241,16 +260,17 @@ int main()
         window.draw(timestamp_bar_max);
         window.draw(timestamp_bar);
         for (int i = 0; i < directory_text_vector.size(); i++) {
-            directory_text_vector[i].setPosition(5, 45 + height + (i * 20));
-            if (cursor.getGlobalBounds().intersects(directory_text_vector[i].getGlobalBounds()) && directory_text_vector[i].getGlobalBounds().intersects(view.getGlobalBounds())) {
+            directory_text_vector[i].setPosition(5, 45 + height + (scroll_value * 20) + (i * 20));
+            if (cursor.getGlobalBounds().intersects(directory_text_vector[i].getGlobalBounds()) && directory_text_vector[i].getGlobalBounds().intersects(view_bounds.getGlobalBounds())) {
                 directory_text_vector[i].setFillColor(Color::White);
                 select_bar.setPosition(directory_text_vector[i].getPosition());
                 if (Mouse::isButtonPressed(Mouse::Left)) {
                     string selected_file = file_paths[i];
                     if (soundBuffer.loadFromFile(selected_file)) {
                         sound.setBuffer(soundBuffer);
-                        sound_duration = soundBuffer.getDuration().asSeconds();
-                        file_info_text.setString(file_name[i].substr(0, 21) + "...\nFile size: " + to_string(file_size[i] / 1048576).substr(0, 5) + " Mb" + "\nDuration: " + to_string(sound_duration).substr(0, 5) + " sec");
+                        sound_duration = int(soundBuffer.getDuration().asSeconds());
+                        final_file_name = file_name[i];
+                        final_file_size = file_size[i];
                         sound.play();
                     }
                 }
@@ -260,9 +280,13 @@ int main()
                 directory_text_vector[i].setFillColor(Color(65, 65, 65));
                 select_bar.setPosition(99999, 99999);
             }
-            if (view.getGlobalBounds().intersects(directory_text_vector[i].getGlobalBounds()))
+            if (view_bounds.getGlobalBounds().intersects(directory_text_vector[i].getGlobalBounds()))
                 window.draw(directory_text_vector[i]);
         }
+        remain_minutes = (sound_duration - int(sound.getPlayingOffset().asSeconds())) / 60;
+        remain_seconds = (sound_duration - int(sound.getPlayingOffset().asSeconds())) % 60;
+        file_info_text.setString(final_file_name.substr(0, 19) + "\nFile size: " + to_string(final_file_size / 1048576).substr(0, 4) + " Mb\nTime: " + to_string(remain_minutes) + "m " + to_string(remain_seconds) + "s");
+        
         window.draw(waveformArea);
         window.draw(waveform);
         window.display();
