@@ -9,10 +9,10 @@ using namespace std;
 using namespace sf;
 
 //This function loads the latest visited path from a .txt file that is stored inside the project dir (src/Saves/save.txt)
-string load_latest_path() {
+string load_latest_path(filesystem::path& assets_path) {
     string load_file_path;
     //Open the file that stores the latest save
-    ifstream loadFile("src/Saves/save.txt");
+    ifstream loadFile((assets_path / "Saves/save.txt").string());
     string this_line;
     //Read each line from save.txt
     while (getline(loadFile, this_line)) {
@@ -232,6 +232,23 @@ void load_sound_info(RenderWindow& window, RectangleShape cursor, vector<Text>di
     }
 }
 
+void load_sound_info_from_cmd(RenderWindow& window, RectangleShape cursor, vector<Text>directory_text_vector, float& height,
+    int& scroll_value, RectangleShape& select_bar, vector<string>& file_paths, SoundBuffer& soundBuffer, Sound& sound,
+    RectangleShape& view_bounds, int& sound_duration, string& final_file_name, float& final_file_size,
+    vector<string>& file_name, vector<float>& file_size, bool& has_passed, string& passed_file_path) {
+    if (has_passed) {
+        cout << "passed" << endl;
+        const auto& entry = filesystem::directory_entry(passed_file_path);
+        soundBuffer.loadFromFile(passed_file_path);
+        sound_duration = int(soundBuffer.getDuration().asSeconds());
+        final_file_name = entry.path().filename().string();
+        final_file_size = entry.file_size();
+        sound.setBuffer(soundBuffer);
+        sound.play();
+        has_passed = false;
+    }
+}
+
 void draw_UI(RenderWindow& window, RectangleShape& cursor, vector<Text>& directory_text_vector, RectangleShape& select_bar, 
     RectangleShape& view_bounds, RectangleShape line[], Text& file_path_text, Sprite& play_button, Sprite& next_button, 
     Sprite& prev_button, Text& file_info_text, RectangleShape& timestamp_bar, RectangleShape& timestamp_bar_max,
@@ -261,14 +278,46 @@ void draw_UI(RenderWindow& window, RectangleShape& cursor, vector<Text>& directo
     window.display();
 }
 
-int main() {
+void dynamic_asset_load(int argc, char* argv[], filesystem::path& exe_path, filesystem::path& exe_dir, 
+    filesystem::path& assets_path, bool& has_passed, string& passed_file_path) {
+
+    exe_path = filesystem::absolute(argv[0]); //Get the path from the parent .exe 
+    exe_dir = exe_path.parent_path(); //Get the root from the path from the parent .exe 
+    //Define the assests path
+    assets_path = exe_dir / "src"; //Define the assets folder, which is located to the parent directory
+
+    //Load the sound path at startup if the user clicks directly to an audio file
+    //Check if an audio file is passed
+    if (argc < 2)
+        cout << "No audio file passed" << endl;
+    else {
+        has_passed = true; //Successfuly passed cmd arguments
+        passed_file_path = argv[1]; //Assign the argument that contains the path of the current .exe
+        cout << passed_file_path << endl;
+    }
+}
+
+int main(int argc, char* argv[]) {
+    //Load app assets dynamically if the .exe is indepented, like when
+    //"Da music player" is set as a default application for opening audio files
+    filesystem::path exe_path; //Get the path from which the current .exe was openend
+    filesystem::path exe_dir; //Get the root from the path from which the current .exe was opened
+    filesystem::path assets_path;
+    bool has_passed = false; //If a cmd argumant has passed
+    string passed_file_path;
+    dynamic_asset_load(argc, argv, exe_path, exe_dir, assets_path, has_passed, passed_file_path);
+
     //Initialize the version, the window and its events
-    string version = "Da music player v.2.1";
+    string version = "Da music player v.3.0";
     RenderWindow window(VideoMode(995, 735), version, Style::Close);
     Event event;
+    //Set the window icon
+    Image image;
+    image.loadFromFile((assets_path / "Textures/logo.png").string());
+    window.setIcon(image.getSize().x, image.getSize().y, image.getPixelsPtr());
 
     //Sets the default path that contains the audio files
-    string load_file_path = load_latest_path();
+    string load_file_path = load_latest_path(assets_path);
 
     //This value increases or decreases if the mouse wheel goes up or down
     //It is used to go up and down the audio list in the current directory
@@ -276,16 +325,16 @@ int main() {
 
     //Load a font for the text
     Font font;
-    font.loadFromFile("src/Fonts/font.ttf");
+    font.loadFromFile((assets_path / "Fonts/font.ttf").string());
     //Initialize the UI
     //Create textures for each button
     Texture play_button_texture;
     Texture next_button_texture;
     Texture prev_button_texture;
     //Load the texture
-    play_button_texture.loadFromFile("src/Textures/play.png");
-    next_button_texture.loadFromFile("src/Textures/next.png");
-    prev_button_texture.loadFromFile("src/Textures/prev.png");
+    play_button_texture.loadFromFile((assets_path / "Textures/play.png").string());
+    next_button_texture.loadFromFile((assets_path / "Textures/next.png").string());
+    prev_button_texture.loadFromFile((assets_path / "Textures/prev.png").string());
     //Create the sprites and give them the textures
     Sprite play_button;
     play_button.setTexture(play_button_texture);
@@ -377,6 +426,10 @@ int main() {
     float scaleY = 0.003; //Controls the max heihgt of the waveform
     int remain_minutes = 0; //Stores the remain minutes of the audio
     int remain_seconds = 0; //Stores the remain seconds of the audio
+
+    //Load and play sound at startup if the user clicks directly to an audio file
+    load_sound_info_from_cmd(window, cursor, directory_text_vector, height, scroll_value, select_bar, file_paths, soundBuffer, sound,
+        view_bounds, sound_duration, final_file_name, final_file_size, file_name, file_size, has_passed, passed_file_path);
 
     //Main window loop, terminates when the window is closed
     while (window.isOpen()) {
