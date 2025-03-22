@@ -1,4 +1,4 @@
-# Da Music Player (v.2.1) 🎵  
+# Da Music Player (v.3.0) 🎵  
 
 A simple, retro, music player built in C++, using the SFML library (for the UI and Audio), that allows you to:  
 ✅ Search directories for music files  
