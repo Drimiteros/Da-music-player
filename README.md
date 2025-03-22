@@ -7,7 +7,7 @@ A simple, retro, music player built in C++, using the SFML library (for the UI a
 
 Simple stuff!  
 
-![Screenshot_5](https://github.com/user-attachments/assets/f7fbc02d-1a3a-4144-ba0d-4a6fc9015a49)
+![Screenshot_5](https://github.com/user-attachments/assets/f7fbc02d-1a3a-4144-ba0d-4a6fc9015a49) 
 
 ---
 
