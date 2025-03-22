@@ -27,4 +27,5 @@ Simple stuff!
 ---
 
 ## 🔗 Useful Links  
-- SFML Download - Link (https://www.sfml-dev.org/download/sfml/old-versions.php)  
+- SFML Download - Link: https://www.sfml-dev.org/download/sfml/old-versions.php
+- Give your feedback: https://tally.so/r/w2o8Rp
