@@ -4,7 +4,7 @@ A simple, retro, music player built in C++, using the SFML library (for the UI a
 - ✅ Open audio files 
 - ✅ Search directories for audio files 
 - ✅ Control playback 
-- ✅View timestamps and waveform 
+- ✅ View timestamps and waveform 
 
 Simple stuff!  
 
