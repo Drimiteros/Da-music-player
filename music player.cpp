@@ -34,75 +34,85 @@ void save_file_path(string& load_file_path) {
     saveFile << "latest directory: " + load_file_path;
 }
 
-void set_new_target_directory(Event& event, string& load_file_path, Text& file_path_text, RectangleShape line[]) {
-    //If the user clicks buttons, we get what button is being pressed and add it to the load_file_path string in order to set the 
-            //new directory we want to search
-    if (event.type == Event::TextEntered && !Keyboard::isKeyPressed(Keyboard::BackSpace) && !Keyboard::isKeyPressed(Keyboard::Enter))
-        load_file_path += event.text.unicode;
-    //If the user enters backspace, we remove the last character from the load_file_path string 
-    if (event.type == Event::TextEntered && Keyboard::isKeyPressed(Keyboard::BackSpace) && !Keyboard::isKeyPressed(Keyboard::Enter))
-        load_file_path = load_file_path.substr(0, load_file_path.size() - 1);
-    //Set the final path to file_path_text in order to display it in the screen
-    file_path_text.setString(load_file_path);
+void set_new_target_directory(RenderWindow& window, Event& event, string& load_file_path, Text& file_path_text, RectangleShape line[]) {
+    if (window.hasFocus()) {
+        //If the user clicks buttons, we get what button is being pressed and add it to the load_file_path string in order to set the 
+        //new directory we want to search
+        if (event.type == Event::TextEntered && !Keyboard::isKeyPressed(Keyboard::BackSpace) && !Keyboard::isKeyPressed(Keyboard::Enter))
+            load_file_path += event.text.unicode;
+
+        //If the user enters backspace, we remove the last character from the load_file_path string 
+        if (event.type == Event::TextEntered && Keyboard::isKeyPressed(Keyboard::BackSpace) && !Keyboard::isKeyPressed(Keyboard::Enter))
+            load_file_path = load_file_path.substr(0, load_file_path.size() - 1);
+
+        //Set the final path to file_path_text in order to display it in the screen
+        file_path_text.setString(load_file_path);
+    }
     //We update the position of the blinking cursor to be next to the file_path_text always
     line[2].setPosition(file_path_text.getLocalBounds().getSize().x + 10, 5);
 }
 
-void set_file_list_position(Event& event, float& height, int& scroll_value, bool& stop_search) {
-    //We update the height of the visible files names on the screen
-    if (event.type == Event::KeyPressed && Keyboard::isKeyPressed(Keyboard::Down))
-        height -= 20;
-    if (event.type == Event::KeyPressed && Keyboard::isKeyPressed(Keyboard::Up))
-        height += 20;
-    //When we scroll the mouse wheel, we increase or decrease the height of the visible files names on the screen
-    if (event.type == Event::MouseWheelScrolled) {
-        if (event.mouseWheelScroll.wheel == Mouse::VerticalWheel) {
-            //If mouse wheel up
-            if (event.mouseWheelScroll.delta > 0)
-                scroll_value++;
-            //If mouse whell down
-            if (event.mouseWheelScroll.delta < 0)
-                scroll_value--;
+void set_file_list_position(RenderWindow& window, Event& event, float& height, int& scroll_value, bool& stop_search) {
+    if (window.hasFocus()) {
+        //We update the height of the visible files names on the screen
+        if (event.type == Event::KeyPressed && Keyboard::isKeyPressed(Keyboard::Down))
+            height -= 20;
+        if (event.type == Event::KeyPressed && Keyboard::isKeyPressed(Keyboard::Up))
+            height += 20;
+        //When we scroll the mouse wheel, we increase or decrease the height of the visible files names on the screen
+        if (event.type == Event::MouseWheelScrolled) {
+            if (event.mouseWheelScroll.wheel == Mouse::VerticalWheel) {
+                //If mouse wheel up
+                if (event.mouseWheelScroll.delta > 0)
+                    scroll_value++;
+                //If mouse whell down
+                if (event.mouseWheelScroll.delta < 0)
+                    scroll_value--;
+            }
         }
+        //When we press Enter, we reset the search of files in the current directory
+        if (event.type == Event::KeyPressed && Keyboard::isKeyPressed(Keyboard::Enter) && !Keyboard::isKeyPressed(Keyboard::LShift))
+            stop_search = false;
     }
-    //When we press Enter, we reset the search of files in the current directory
-    if (event.type == Event::KeyPressed && Keyboard::isKeyPressed(Keyboard::Enter) && !Keyboard::isKeyPressed(Keyboard::LShift))
-        stop_search = false;
 }
 
-void control_playback_via_keys(Event& event, RectangleShape& cursor, Sprite& next_button, Sprite& prev_button, 
+void control_playback_via_keys(RenderWindow& window, Event& event, RectangleShape& cursor, Sprite& next_button, Sprite& prev_button,
     Sprite& play_button, Sound& sound, float& sound_offset) {
-    //When we press the right arrow key, we increase the progress of the audio by 5 sec
-    if ((Keyboard::isKeyPressed(Keyboard::Right)) || (cursor.getGlobalBounds().intersects(next_button.getGlobalBounds()) && event.type == Event::MouseButtonPressed
-        && Mouse::isButtonPressed(Mouse::Left))) {
-        sound_offset = sound.getPlayingOffset().asSeconds() + 5;
-        sound.setPlayingOffset(seconds(sound_offset));
+    if (window.hasFocus()) {
+        //When we press the right arrow key, we increase the progress of the audio by 5 sec
+        if ((Keyboard::isKeyPressed(Keyboard::Right)) || (cursor.getGlobalBounds().intersects(next_button.getGlobalBounds()) && event.type == Event::MouseButtonPressed
+            && Mouse::isButtonPressed(Mouse::Left))) {
+            sound_offset = sound.getPlayingOffset().asSeconds() + 5;
+            sound.setPlayingOffset(seconds(sound_offset));
+        }
+        //When we press the left arrow key, we decrease the progress of the audio by 5 sec
+        if ((Keyboard::isKeyPressed(Keyboard::Left)) || (cursor.getGlobalBounds().intersects(prev_button.getGlobalBounds()) && event.type == Event::MouseButtonPressed
+            && Mouse::isButtonPressed(Mouse::Left))) {
+            sound_offset = sound.getPlayingOffset().asSeconds() - 5;
+            sound.setPlayingOffset(seconds(sound_offset));
+        }
+        //When we press the spacebar and the audio is playing, we pause the audio
+        if (((event.type == Event::KeyPressed && Keyboard::isKeyPressed(Keyboard::Space))
+            || (cursor.getGlobalBounds().intersects(play_button.getGlobalBounds()) && event.type == Event::MouseButtonPressed && Mouse::isButtonPressed(Mouse::Left)))
+            && sound.getStatus() == sound.Playing)
+            sound.pause();
+        //When we press the spacebar and the audio is not playing, we play the audio
+        else if (((event.type == Event::KeyPressed && Keyboard::isKeyPressed(Keyboard::Space))
+            || (cursor.getGlobalBounds().intersects(play_button.getGlobalBounds()) && event.type == Event::MouseButtonPressed && Mouse::isButtonPressed(Mouse::Left)))
+            && sound.getStatus() == sound.Paused)
+            sound.play();
     }
-    //When we press the left arrow key, we decrease the progress of the audio by 5 sec
-    if ((Keyboard::isKeyPressed(Keyboard::Left)) || (cursor.getGlobalBounds().intersects(prev_button.getGlobalBounds()) && event.type == Event::MouseButtonPressed
-        && Mouse::isButtonPressed(Mouse::Left))) {
-        sound_offset = sound.getPlayingOffset().asSeconds() - 5;
-        sound.setPlayingOffset(seconds(sound_offset));
-    }
-    //When we press the spacebar and the audio is playing, we pause the audio
-    if (((event.type == Event::KeyPressed && Keyboard::isKeyPressed(Keyboard::Space))
-        || (cursor.getGlobalBounds().intersects(play_button.getGlobalBounds()) && event.type == Event::MouseButtonPressed && Mouse::isButtonPressed(Mouse::Left)))
-        && sound.getStatus() == sound.Playing)
-        sound.pause();
-    //When we press the spacebar and the audio is not playing, we play the audio
-    else if (((event.type == Event::KeyPressed && Keyboard::isKeyPressed(Keyboard::Space))
-        || (cursor.getGlobalBounds().intersects(play_button.getGlobalBounds()) && event.type == Event::MouseButtonPressed && Mouse::isButtonPressed(Mouse::Left)))
-        && sound.getStatus() == sound.Paused)
-        sound.play();
 }
 
-void control_playback_via_UI(RectangleShape& cursor, RectangleShape& timestamp_bar, RectangleShape& timestamp_bar_max,
+void control_playback_via_UI(RenderWindow& window, RectangleShape& cursor, RectangleShape& timestamp_bar, RectangleShape& timestamp_bar_max,
     SoundBuffer& soundBuffer, Sound& sound) {
-    //When we click inside the timestamp_bar_max, we set the current progress of the audio.
-        //We dynamically calculate the audio progress based on the cursor position relative to the position and size of timestamp_bar
-    if (cursor.getGlobalBounds().intersects(timestamp_bar_max.getGlobalBounds()) && Mouse::isButtonPressed(Mouse::Left)) {
-        float playing_offset = ((cursor.getPosition().x - timestamp_bar.getPosition().x) / timestamp_bar_max.getLocalBounds().width) * soundBuffer.getDuration().asSeconds();
-        sound.setPlayingOffset(seconds(playing_offset));
+    if (window.hasFocus()) {
+        //When we click inside the timestamp_bar_max, we set the current progress of the audio.
+            //We dynamically calculate the audio progress based on the cursor position relative to the position and size of timestamp_bar
+        if (cursor.getGlobalBounds().intersects(timestamp_bar_max.getGlobalBounds()) && Mouse::isButtonPressed(Mouse::Left)) {
+            float playing_offset = ((cursor.getPosition().x - timestamp_bar.getPosition().x) / timestamp_bar_max.getLocalBounds().width) * soundBuffer.getDuration().asSeconds();
+            sound.setPlayingOffset(seconds(playing_offset));
+        }
     }
 }
 
@@ -110,7 +120,7 @@ void UI_update(RectangleShape& cursor, Sprite& play_button, Sprite& next_button,
     RectangleShape line[], Sound& sound, RectangleShape& timestamp_bar, RectangleShape& timestamp_bar_max, SoundBuffer& soundBuffer,
     int& remain_minutes, int& remain_seconds, int& sound_duration, Text& file_info_text, string& final_file_name,
     float& final_file_size, vector<Text>& directory_text_vector, float& height, int& scroll_value, RectangleShape& view_bounds,
-    RectangleShape& select_bar) {
+    RectangleShape& select_bar, Text text[]) {
     //We update the UI and render a different part of the texture for the buttons every time the cursor intersects with them
     if (cursor.getGlobalBounds().intersects(play_button.getGlobalBounds()))
         play_button.setTextureRect(IntRect(20, 0, 20, 20));
@@ -124,6 +134,21 @@ void UI_update(RectangleShape& cursor, Sprite& play_button, Sprite& next_button,
         prev_button.setTextureRect(IntRect(0, 0, 30, 20));
     else
         prev_button.setTextureRect(IntRect(30, 0, 30, 20));
+
+    for (int i = 0; i < 5; i++) {
+        if (cursor.getGlobalBounds().intersects(text[i].getGlobalBounds())) {
+            text[i].setFillColor(Color::White);
+            if (Mouse::isButtonPressed(Mouse::Left) && i == 1)
+                system("start https://tally.so/r/w2o8Rp");
+            if (Mouse::isButtonPressed(Mouse::Left) && i == 2)
+                system("start https://www.paypal.com/donate/?hosted_button_id=78QYVASFNBDSJ");
+            if (Mouse::isButtonPressed(Mouse::Left) && i == 0) {
+
+            }
+        }
+        else
+            text[i].setFillColor(Color::Black);
+    }
 
     if (clock.getElapsedTime().asSeconds() < 0.5)
         line[2].setFillColor(Color(255, 220, 155));
@@ -218,7 +243,7 @@ void load_sound_info(RenderWindow& window, RectangleShape cursor, vector<Text>di
     for (int i = 0; i < directory_text_vector.size(); i++) {
         directory_text_vector[i].setPosition(5, 45 + height + (scroll_value * 20) + (i * 20));
         if (cursor.getGlobalBounds().intersects(directory_text_vector[i].getGlobalBounds()) && directory_text_vector[i].getGlobalBounds().intersects(view_bounds.getGlobalBounds())) {
-            if (Mouse::isButtonPressed(Mouse::Left)) {
+            if (Mouse::isButtonPressed(Mouse::Left) && window.hasFocus()) {
                 string selected_file = file_paths[i];
                 if (soundBuffer.loadFromFile(selected_file)) {
                     sound.setBuffer(soundBuffer);
@@ -247,35 +272,6 @@ void load_sound_info_from_cmd(RenderWindow& window, RectangleShape cursor, vecto
         sound.play();
         has_passed = false;
     }
-}
-
-void draw_UI(RenderWindow& window, RectangleShape& cursor, vector<Text>& directory_text_vector, RectangleShape& select_bar, 
-    RectangleShape& view_bounds, RectangleShape line[], Text& file_path_text, Sprite& play_button, Sprite& next_button, 
-    Sprite& prev_button, Text& file_info_text, RectangleShape& timestamp_bar, RectangleShape& timestamp_bar_max,
-    RectangleShape& waveformArea, VertexArray& waveform) {
-    window.clear();
-    window.draw(line[0]);
-    window.draw(line[1]);
-    window.draw(line[2]);
-    window.draw(file_path_text);
-    window.draw(play_button);
-    window.draw(next_button);
-    window.draw(prev_button);
-    window.draw(file_info_text);
-    window.draw(timestamp_bar_max);
-    window.draw(timestamp_bar);
-    
-    for (int i = 0; i < directory_text_vector.size(); i++) {
-        if (cursor.getGlobalBounds().intersects(directory_text_vector[i].getGlobalBounds()) && directory_text_vector[i].getGlobalBounds().intersects(view_bounds.getGlobalBounds())) {
-            window.draw(select_bar);
-        }
-        if (view_bounds.getGlobalBounds().intersects(directory_text_vector[i].getGlobalBounds()))
-            window.draw(directory_text_vector[i]);
-    }
-
-    window.draw(waveformArea);
-    window.draw(waveform);
-    window.display();
 }
 
 void dynamic_asset_load(int argc, char* argv[], filesystem::path& exe_path, filesystem::path& exe_dir, 
@@ -308,8 +304,8 @@ int main(int argc, char* argv[]) {
     dynamic_asset_load(argc, argv, exe_path, exe_dir, assets_path, has_passed, passed_file_path);
 
     //Initialize the version, the window and its events
-    string version = "Da music player v.3.0";
-    RenderWindow window(VideoMode(995, 735), version, Style::Close);
+    string version = "Da music player v.3.1";
+    RenderWindow window(VideoMode(995, 770), version, Style::Close);
     Event event;
     //Set the window icon
     Image image;
@@ -371,19 +367,6 @@ int main(int argc, char* argv[]) {
     file_info_text.setFillColor(Color(255, 255, 255));
     file_info_text.setString("Now playing:\nFile size:\nDuration:"); //Placeholder string
     vector<string> file_paths; //Stores the full path of each file inside a directory
-
-    Clock clock; //We use this to make the cursor blink ever 0.5 sec
-    bool stop_search = false; //When this variable is true, we stop the loop that searches through the directory we chose to view
-    vector<string>file_name; //Store every file name inside a directory
-    string final_file_name; //Store the name of the current selected audio file that we are playing
-    vector<float>file_size; //Store every file size inside a directory
-    float final_file_size = 0; //Store the size of the current selected audio file that we are playing
-
-    SoundBuffer soundBuffer; //Stores the audio we want to play in memory
-    Sound sound; //Holds the audio data from the soundBuffer
-    float sound_offset = 0; //Is used to set the timestamp of the audio (what is the current position of the sound)
-    int sound_duration = 0; //Holds the sound duration
-
     //view_bounds is a rectangle that sets the limit of the current visible names of audio files inside a directory. 
     //If the current Text that each holds the name of a file (directory_text_vector) intersects with view_bounds, then it's being painted to the screen
     RectangleShape view_bounds;
@@ -411,6 +394,40 @@ int main(int argc, char* argv[]) {
     RectangleShape timestamp_bar_max; //A rectangle that represents the background of the timestamp_bar
     timestamp_bar_max.setPosition(5, 707);
     timestamp_bar_max.setFillColor(Color(255, 255, 255));
+    //Initialize sidebar
+    RectangleShape sidebar;
+    sidebar.setPosition(0, 740);
+    sidebar.setSize(Vector2f(1000, 40));
+    sidebar.setFillColor(Color(255, 148, 48));
+    sidebar.setOutlineThickness(1);
+    sidebar.setOutlineColor(Color::White);
+    Texture gear_texture;
+    gear_texture.setSmooth(true);
+    gear_texture.loadFromFile((assets_path / "Textures/gear.png").string());
+    Text text[5];
+    for (int i = 0;i < 5;i++) {
+        text[i].setFillColor(Color::Black);
+        text[i].setFont(font);
+        text[i].setCharacterSize(15);
+    }
+    text[0].setString("Options");
+    text[0].setPosition(10, 745);
+    text[1].setString("Feedback");
+    text[1].setPosition(100, 745);
+    text[2].setString("Support");
+    text[2].setPosition(210, 745);
+
+    Clock clock; //We use this to make the cursor blink ever 0.5 sec
+    bool stop_search = false; //When this variable is true, we stop the loop that searches through the directory we chose to view
+    vector<string>file_name; //Store every file name inside a directory
+    string final_file_name; //Store the name of the current selected audio file that we are playing
+    vector<float>file_size; //Store every file size inside a directory
+    float final_file_size = 0; //Store the size of the current selected audio file that we are playing
+
+    SoundBuffer soundBuffer; //Stores the audio we want to play in memory
+    Sound sound; //Holds the audio data from the soundBuffer
+    float sound_offset = 0; //Is used to set the timestamp of the audio (what is the current position of the sound)
+    int sound_duration = 0; //Holds the sound duration
 
     //Initialize the waveform
     //VertexArray waveform stores a collection of vertices (each vertex uses a audio sample to set its current y position in the screen). 
@@ -440,19 +457,19 @@ int main(int argc, char* argv[]) {
             if (event.type == Event::Closed)
                 window.close();
 
-            set_new_target_directory(event, load_file_path, file_path_text, line);
-            set_file_list_position(event, height, scroll_value, stop_search);
-            control_playback_via_keys(event, cursor, next_button, prev_button, play_button, sound, sound_offset);
+            set_new_target_directory(window, event, load_file_path, file_path_text, line);
+            set_file_list_position(window, event, height, scroll_value, stop_search);
+            control_playback_via_keys(window, event, cursor, next_button, prev_button, play_button, sound, sound_offset);
         }
-
+        
         //We set the physical mouse cursor to follow the actual mouse cursor
         cursor.setPosition(window.mapPixelToCoords(Vector2i(Mouse::getPosition(window).x, Mouse::getPosition(window).y)));
 
-        control_playback_via_UI(cursor, timestamp_bar, timestamp_bar_max, soundBuffer, sound);
+        control_playback_via_UI(window, cursor, timestamp_bar, timestamp_bar_max, soundBuffer, sound);
 
         UI_update(cursor, play_button, next_button, prev_button, clock, line, sound, timestamp_bar, timestamp_bar_max, soundBuffer, 
             remain_minutes, remain_seconds, sound_duration, file_info_text, final_file_name, final_file_size, directory_text_vector, 
-            height, scroll_value, view_bounds, select_bar);
+            height, scroll_value, view_bounds, select_bar, text);
 
         search_directory_path(stop_search, directory_text, directory_text_vector, load_file_path, file_name, file_size, file_paths);
 
@@ -461,8 +478,33 @@ int main(int argc, char* argv[]) {
 
         waveform_update(soundBuffer, sound, samples, sample_count, channel_count, waveform, waveformArea, scaleY);
 
-        draw_UI(window, cursor, directory_text_vector, select_bar, view_bounds, line, file_path_text, play_button, 
-            next_button, prev_button, file_info_text, timestamp_bar, timestamp_bar_max, waveformArea, waveform);
+        //Draw graphics
+        window.clear();
+        window.draw(line[0]);
+        window.draw(line[1]);
+        window.draw(line[2]);
+        window.draw(file_path_text);
+        window.draw(play_button);
+        window.draw(next_button);
+        window.draw(prev_button);
+        window.draw(file_info_text);
+        window.draw(timestamp_bar_max);
+        window.draw(timestamp_bar);
+
+        for (int i = 0; i < directory_text_vector.size(); i++) {
+            if (cursor.getGlobalBounds().intersects(directory_text_vector[i].getGlobalBounds()) && directory_text_vector[i].getGlobalBounds().intersects(view_bounds.getGlobalBounds())) {
+                window.draw(select_bar);
+            }
+            if (view_bounds.getGlobalBounds().intersects(directory_text_vector[i].getGlobalBounds()))
+                window.draw(directory_text_vector[i]);
+        }
+
+        window.draw(waveformArea);
+        window.draw(waveform);
+        window.draw(sidebar);
+        for (int i = 0;i < 5;i++)
+            window.draw(text[i]);
+        window.display();
     }
 
     save_file_path(load_file_path);
