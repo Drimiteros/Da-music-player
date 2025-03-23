@@ -15,8 +15,8 @@ private:
 
 public:
 	load_sound_info_class();
-	void load_sound_info(RenderWindow& window, RectangleShape& cursor, float& height, int& scroll_value, vector<string>& file_paths, 
-		SoundBuffer& soundBuffer, Sound& sound, int& sound_duration, string& final_file_name, float& final_file_size,
-		vector<string>& file_name, vector<float>& file_size, vector<Text>& directory_text_vector);
+	void load_sound_info(RenderWindow& window, RectangleShape& cursor, vector<string>& file_paths, SoundBuffer& soundBuffer, 
+		Sound& sound, int& sound_duration, string& final_file_name, float& final_file_size, vector<string>& file_name, 
+		vector<float>& file_size, vector<Text>& directory_text_vector);
 };
 

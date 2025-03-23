@@ -50,13 +50,8 @@ int main(int argc, char* argv[]) {
     dynamic_asset_load_class dynamic_asset_load_class_obj;
     dynamic_asset_load_class_obj.dynamic_asset_load(argc, argv, assets_path, has_passed, passed_file_path);
 
-    load_sound_from_cmd_class load_sound_from_cmd_class_obj;
-
-    load_sound_info_class load_sound_info_class_obj;
-
-    search_directory_path_class search_directory_path_class_obj;
-
-    waveform_class waveform_class_obj;
+    //Sets the default path that contains the audio files
+    string load_file_path = load_latest_path(assets_path);
 
     //Initialize the version, the window and its events
     string version = "Da music player v.3.1";
@@ -67,12 +62,12 @@ int main(int argc, char* argv[]) {
     image.loadFromFile((assets_path / "Textures/logo.png").string());
     window.setIcon(image.getSize().x, image.getSize().y, image.getPixelsPtr());
 
-    //Sets the default path that contains the audio files
-    string load_file_path = load_latest_path(assets_path);
+    load_sound_from_cmd_class load_sound_from_cmd_class_obj;
+    load_sound_info_class load_sound_info_class_obj;
+    search_directory_path_class search_directory_path_class_obj;
+    waveform_class waveform_class_obj;
 
     //This value increases or decreases if the mouse wheel goes up or down
-    int scroll_value = 0; //It is used to go up and down the audio list in the current directory
-    float height = 0; //Controls the y position in the screen of every file name inside a directory
     RectangleShape cursor; //A rectangle that acts as a physical cursor. It's used to see whith what objects our actul cursor comes in contact
     cursor.setSize(Vector2f(1, 1));
 
@@ -96,9 +91,6 @@ int main(int argc, char* argv[]) {
     float sound_offset = 0; //Is used to set the timestamp of the audio (what is the current position of the sound)
     int sound_duration = 0; //Holds the sound duration
 
-    int remain_minutes = 0; //Stores the remain minutes of the audio
-    int remain_seconds = 0; //Stores the remain seconds of the audio
-
     //Load and play sound at startup if the user clicks directly to an audio file
     load_sound_from_cmd_class_obj.load_sound_from_cmd(soundBuffer, sound, sound_duration, final_file_name, final_file_size, file_name, 
         file_size, has_passed, passed_file_path);
@@ -113,7 +105,7 @@ int main(int argc, char* argv[]) {
                 window.close();
 
             UI_class_obj.set_new_target_directory(window, event, load_file_path);
-            UI_class_obj.set_file_list_position(window, event, height, scroll_value, stop_search);
+            UI_class_obj.set_file_list_position(window, event, stop_search);
             UI_class_obj.control_playback_via_keys(window, event, cursor, sound, sound_offset);
         }
         
@@ -122,13 +114,13 @@ int main(int argc, char* argv[]) {
 
         UI_class_obj.control_playback_via_UI(window, cursor, soundBuffer, sound);
 
-        UI_class_obj.UI_update(cursor, sound, soundBuffer, remain_minutes, remain_seconds, sound_duration, final_file_name,
-            final_file_size, scroll_value, height, directory_text_vector, directory_text);
+        UI_class_obj.UI_update(cursor, sound, soundBuffer, sound_duration, final_file_name, final_file_size, 
+            directory_text_vector, directory_text);
 
         search_directory_path_class_obj.search_directory_path(stop_search, load_file_path, file_name, file_size, file_paths,
             directory_text_vector, directory_text);
 
-        load_sound_info_class_obj.load_sound_info(window, cursor, height, scroll_value, file_paths, soundBuffer, sound, 
+        load_sound_info_class_obj.load_sound_info(window, cursor, file_paths, soundBuffer, sound, 
             sound_duration, final_file_name, final_file_size, file_name, file_size, directory_text_vector);
 
         waveform_class_obj.waveform_logic(soundBuffer, sound);

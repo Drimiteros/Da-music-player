@@ -41,6 +41,11 @@ protected:
 
     Clock clock; //We use this to make the cursor blink ever 0.5 sec
 
+    float height = 0; //Controls the y position in the screen of every file name inside a directory
+    int scroll_value = 0; //It is used to go up and down the audio list in the current directory
+    int remain_minutes = 0; //Stores the remain minutes of the audio
+    int remain_seconds = 0; //Stores the remain seconds of the audio
+
 public:
     filesystem::path assets_path;
     string load_file_path;
@@ -48,11 +53,10 @@ public:
 	UI_class();
     void init_vars(filesystem::path& get_assets_path, string& get_load_file_path, Text& directory_text);
     void set_new_target_directory(RenderWindow& window, Event& event, string& load_file_path);
-    void set_file_list_position(RenderWindow& window, Event& event, float& height, int& scroll_value, bool& stop_search);
+    void set_file_list_position(RenderWindow& window, Event& event, bool& stop_search);
     void control_playback_via_keys(RenderWindow& window, Event& event, RectangleShape& cursor, Sound& sound, float& sound_offset);
-    void UI_update(RectangleShape& cursor, Sound& sound, SoundBuffer& soundBuffer, int& remain_minutes, int& remain_seconds, 
-        int& sound_duration, string& final_file_name, float& final_file_size, int& scroll_value, float& height,
-        vector<Text>& directory_text_vector, Text& directory_text);
+    void UI_update(RectangleShape& cursor, Sound& sound, SoundBuffer& soundBuffer, int& sound_duration, string& final_file_name, 
+        float& final_file_size, vector<Text>& directory_text_vector, Text& directory_text);
     void control_playback_via_UI(RenderWindow& window, RectangleShape& cursor, SoundBuffer& soundBuffer, Sound& sound);
     void draw(RenderWindow& window, RectangleShape& cursor, vector<Text>& directory_text_vector, Text& directory_text);
 };

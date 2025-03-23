@@ -101,7 +101,7 @@ void UI_class::set_new_target_directory(RenderWindow& window, Event& event, stri
     //We update the position of the blinking cursor to be next to the file_path_text always
     line[2].setPosition(file_path_text.getLocalBounds().getSize().x + 10, 5);
 }
-void UI_class::set_file_list_position(RenderWindow& window, Event& event, float& height, int& scroll_value, bool& stop_search) {
+void UI_class::set_file_list_position(RenderWindow& window, Event& event, bool& stop_search) {
     if (window.hasFocus()) {
         //We update the height of the visible files names on the screen
         if (event.type == Event::KeyPressed && Keyboard::isKeyPressed(Keyboard::Down))
@@ -151,9 +151,8 @@ void UI_class::control_playback_via_keys(RenderWindow& window, Event& event, Rec
     }
 }
 
-void UI_class::UI_update(RectangleShape& cursor, Sound& sound, SoundBuffer& soundBuffer, int& remain_minutes, int& remain_seconds,
-    int& sound_duration, string& final_file_name, float& final_file_size, int& scroll_value, float& height,
-    vector<Text>& directory_text_vector, Text& directory_text) {
+void UI_class::UI_update(RectangleShape& cursor, Sound& sound, SoundBuffer& soundBuffer, int& sound_duration, string& final_file_name, 
+    float& final_file_size, vector<Text>& directory_text_vector, Text& directory_text) {
 
     //We update the UI and render a different part of the texture for the buttons every time the cursor intersects with them
     if (cursor.getGlobalBounds().intersects(play_button.getGlobalBounds()))
