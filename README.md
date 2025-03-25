@@ -28,7 +28,7 @@ Simple stuff!
 ---
 
 ## 🛠️ Tech Stack  
-- **C++ 17 and above**  
+- **C++ 20**  
 - **SFML 2.6.0**
 - **Visual Studio 2022**
 
