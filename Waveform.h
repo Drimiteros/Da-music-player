@@ -16,13 +16,14 @@ private:
     const Int16* samples = nullptr; //Unsigned 16 bit integer that stores the audio samples
     size_t sample_count = 0; //Unsigned integer that stores the sample amount
     size_t channel_count = 0; //Unsigned integer that stores the audio channel amount.
-    float scaleY = 1; //Controls the max heihgt of the waveform
+    float scaleY = 0.01; //Controls the max heihgt of the waveform
     int remain_minutes = 0; //Stores the remain minutes of the audio
     int remain_seconds = 0; //Stores the remain seconds of the audio
+    RectangleShape waveformArea; //A rectangle that acts as a backgorund for the waveform
 
 public:
     Waveform();
-    void waveform_logic(Music& music);
+    void waveform_logic(Music& music, SoundBuffer& soundBuffer);
     void draw(RenderWindow& window);
 };
 

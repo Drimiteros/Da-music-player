@@ -15,7 +15,7 @@ App::App(int argc, char* argv[]) {
 	window.setIcon(window_icon.getSize().x, window_icon.getSize().y, window_icon.getPixelsPtr());
 
 	// Initialize UI 
-	play_audio.init_textures(assets_path);
+	play_audio.init_assets(assets_path);
 	cursor.setSize(Vector2f(5, 5));
 	font.loadFromFile((assets_path / "Fonts/font.ttf").string());
 	search_bar_text.setFont(font);
@@ -29,6 +29,9 @@ App::App(int argc, char* argv[]) {
 	caret.setFillColor(Color(255, 207, 150));
 	search_bar_bounds.setSize(Vector2f(995, 26));
 	search_bar_bounds.setFillColor(Color(31, 34, 44));
+	view_bounds.setSize(Vector2f(995, 595));
+	view_bounds.setFillColor(Color(31, 34, 44));
+	view_bounds.setPosition(0, 45);
 }
 
 void App::events() {
@@ -68,9 +71,10 @@ void App::update() {
 	cursor.setPosition(window.mapPixelToCoords(Mouse::getPosition(window)));
 
 	// Play sound that was passed from cmd arguments
-	play_audio.play_audio_from_args(has_passed, passed_audio_from_args, music);
-	play_audio.play_audio_from_current_dir(search_bar, found_files_vector_text, cursor, music, search_directory, file_size, window);
-	play_audio.control_time_stamp(cursor, music, is_clicked, window);
+	play_audio.play_audio_from_args(has_passed, passed_audio_from_args, music, soundBuffer);
+	play_audio.play_audio_from_current_dir(search_bar, found_files_vector_text, cursor, music, soundBuffer, file_size, window, view_bounds);
+	play_audio.control_time_stamp(cursor, music, soundBuffer, is_clicked, window);
+	play_audio.control_volume(cursor, music, soundBuffer, window);
 
 	// Set the string for search bar and update caret
 	search_bar_text.setString(search_bar);
@@ -85,15 +89,16 @@ void App::update() {
 	//Search the files inside the current directory
 	search_directory.search_current_directory(search_bar, found_files_vector_text, found_files_text, finished, file_size);
 
-	waveform.waveform_logic(music);
+	waveform.waveform_logic(music, soundBuffer);
 }
 
 void App::draw() {
 
+	window.draw(view_bounds);
 	window.draw(search_bar_bounds);
 	window.draw(search_bar_text);
 	window.draw(caret);
-	search_directory.draw(window, found_files_vector_text, scroll_value, cursor);
-	play_audio.draw(window);
 	waveform.draw(window);
+	search_directory.draw(window, found_files_vector_text, scroll_value, cursor, view_bounds);
+	play_audio.draw(window);
 }

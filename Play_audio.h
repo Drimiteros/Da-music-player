@@ -3,7 +3,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <filesystem>
-#include "Search_directory.h"
 
 using namespace std;
 using namespace sf;
@@ -13,10 +12,13 @@ class Play_audio
 private:
 	RectangleShape timestamp_bar; //A rectangle that represents the audio progress bar
 	RectangleShape timestamp_bar_max; //A rectangle that represents the background of the timestamp_bar
+	RectangleShape volume_bar; // A rectangle that represents the volume bar
+	Sprite volume_cover;
 
 	Texture play_button_texture;
 	Texture next_button_texture;
 	Texture prev_button_texture;
+	Texture volume_cover_texture;
 	Sprite play_button;
 	Sprite next_button;
 	Sprite prev_button;
@@ -33,10 +35,12 @@ private:
 
 public:
 	Play_audio();
-	void init_textures(filesystem::path file_assets);
-	void play_audio_from_args(bool& has_passed, filesystem::path& passed_audio_from_args, Music& music);
-	void play_audio_from_current_dir(string& search_bar, vector<Text>& found_files_vector_text, RectangleShape& cursor, Music& music, Search_directory& search_directory, vector<float>& file_size, RenderWindow& window);
-	void control_time_stamp(RectangleShape& cursor, Music& music, bool& is_clicked, RenderWindow& window);
+	void init_assets(filesystem::path file_assets);
+	void play_audio_from_args(bool& has_passed, filesystem::path& passed_audio_from_args, Music& music, SoundBuffer& soundBuffer);
+	void play_audio_from_current_dir(string& search_bar, vector<Text>& found_files_vector_text, RectangleShape& cursor, Music& music, SoundBuffer& soundBuffer, vector<float>& file_size, 
+		RenderWindow& window, RectangleShape& view_bounds);
+	void control_time_stamp(RectangleShape& cursor, Music& music, SoundBuffer& soundBuffer, bool& is_clicked, RenderWindow& window);
+	void control_volume(RectangleShape& cursor, Music& music, SoundBuffer& soundBuffer, RenderWindow& window);
 	void draw(RenderWindow& window);
 };
 

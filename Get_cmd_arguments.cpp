@@ -5,6 +5,7 @@ Get_cmd_arguments::Get_cmd_arguments() {
 }
 
 void Get_cmd_arguments::find_assets_path(int argc, char* argv[], filesystem::path& assets_path) {
+	
 	//Get the absolute path of the original .exe
 	exe_path = filesystem::absolute(argv[0]);
 	//Get the directory of the path
@@ -14,6 +15,7 @@ void Get_cmd_arguments::find_assets_path(int argc, char* argv[], filesystem::pat
 }
 
 void Get_cmd_arguments::get_Audio_Path_From_Args(int argc, char* argv[], bool& has_passed, filesystem::path& passed_audio_from_args) {
+	
 	if (argc < 2)
 		cout << "No Audio file passed..." << endl;
 	else {

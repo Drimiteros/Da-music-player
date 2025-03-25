@@ -14,50 +14,63 @@ Play_audio::Play_audio() {
 	file_info_text.setPosition(5, 660);
 	file_info_text.setFillColor(Color(131, 134, 144));
 	file_info_text.setString("Now playing:\nFile size:\nDuration:"); //Placeholder string
-}
 
-void Play_audio::init_textures(filesystem::path file_assets) {
-	play_button_texture.loadFromFile((file_assets / "Textures/play.png").string());
-	next_button_texture.loadFromFile((file_assets / "Textures/next.png").string());
-	prev_button_texture.loadFromFile((file_assets / "Textures/prev.png").string());
-	font.loadFromFile((file_assets / "Fonts/font.ttf").string());
-
-	play_button.setTexture(play_button_texture);
 	play_button.setScale(2, 2);
 	play_button.setTextureRect(IntRect(0, 0, 20, 20));
 	play_button.setPosition(995 / 2 - 30, 770 / 2 + 290);
 
-	next_button.setTexture(next_button_texture);
 	next_button.setScale(2, 2);
 	next_button.setTextureRect(IntRect(0, 0, 30, 20));
 	next_button.setPosition(995 / 2 + 40, 770 / 2 + 290);
 
-	prev_button.setTexture(prev_button_texture);
 	prev_button.setScale(2, 2);
 	prev_button.setTextureRect(IntRect(30, 0, 30, 20));
 	prev_button.setPosition(995 / 2 - 120, 770 / 2 + 290);
+
+	volume_cover.setPosition(820, 650);
+	volume_bar.setSize(Vector2f(129, 74));
+	volume_bar.setFillColor(Color(131, 134, 144));
+	volume_bar.setPosition(838, 650);
 }
 
-void Play_audio::play_audio_from_args(bool& has_passed, filesystem::path& passed_audio_from_args, Music& music) {
+void Play_audio::init_assets(filesystem::path file_assets) {
+	play_button_texture.loadFromFile((file_assets / "Textures/play.png").string());
+	next_button_texture.loadFromFile((file_assets / "Textures/next.png").string());
+	prev_button_texture.loadFromFile((file_assets / "Textures/prev.png").string());
+	volume_cover_texture.loadFromFile((file_assets / "Textures/volume cover.png").string());
+	play_button.setTexture(play_button_texture);
+	next_button.setTexture(next_button_texture);
+	prev_button.setTexture(prev_button_texture);
+	volume_cover.setTexture(volume_cover_texture);
+
+	font.loadFromFile((file_assets / "Fonts/font.ttf").string());
+}
+
+void Play_audio::play_audio_from_args(bool& has_passed, filesystem::path& passed_audio_from_args, Music& music, SoundBuffer& soundBuffer) {
 	
 	if (has_passed) {
+		soundBuffer.loadFromFile(passed_audio_from_args.string());
 		music.openFromFile(passed_audio_from_args.string());
 		music.play();
 		has_passed = false;
 	}
 }
 
-void Play_audio::play_audio_from_current_dir(string& search_bar, vector<Text>& found_files_vector_text, RectangleShape& cursor, Music& music, Search_directory& search_directory, 
-	vector<float>& file_size, RenderWindow& window) {
+void Play_audio::play_audio_from_current_dir(string& search_bar, vector<Text>& found_files_vector_text, RectangleShape& cursor, Music& music, SoundBuffer& soundBuffer, 
+	vector<float>& file_size, RenderWindow& window, RectangleShape& view_bounds) {
 	
 	if (window.hasFocus()) {
 		for (int i = 0; i < found_files_vector_text.size(); i++) {
 			if (cursor.getGlobalBounds().intersects(found_files_vector_text[i].getGlobalBounds()) && Mouse::isButtonPressed(Mouse::Left)
-				&& cursor.getGlobalBounds().intersects(search_directory.view_bounds.getGlobalBounds())) {
-				if (search_bar[search_bar.size()] == '\\' && search_bar[search_bar.size()] == '/')
+				&& cursor.getGlobalBounds().intersects(view_bounds.getGlobalBounds())) {
+				if (search_bar[search_bar.size()] == '\\' && search_bar[search_bar.size()] == '/') {
 					music.openFromFile(search_bar + found_files_vector_text[i].getString());
-				else
+					soundBuffer.loadFromFile(search_bar + found_files_vector_text[i].getString());
+				}
+				else {
 					music.openFromFile(search_bar + "\\" + found_files_vector_text[i].getString());
+					soundBuffer.loadFromFile(search_bar + "\\" + found_files_vector_text[i].getString());
+				}
 				file_name = found_files_vector_text[i].getString().toAnsiString();
 				final_file_size = file_size[i];
 				music.play();
@@ -66,7 +79,7 @@ void Play_audio::play_audio_from_current_dir(string& search_bar, vector<Text>& f
 	}
 }
 
-void Play_audio::control_time_stamp(RectangleShape& cursor, Music& music, bool& is_clicked, RenderWindow& window) {
+void Play_audio::control_time_stamp(RectangleShape& cursor, Music& music, SoundBuffer& soundBuffer, bool& is_clicked, RenderWindow& window) {
 	
 	if (window.hasFocus()) {
 		timestamp_bar.setSize(Vector2f(((music.getPlayingOffset().asSeconds() * 1) / music.getDuration().asSeconds()) * 985, 20));
@@ -79,7 +92,10 @@ void Play_audio::control_time_stamp(RectangleShape& cursor, Music& music, bool& 
 		}
 
 		if (cursor.getGlobalBounds().intersects(play_button.getGlobalBounds())) {
-			play_button.setTextureRect(IntRect(20, 0, 20, 20));
+			if (music.getStatus() == music.Playing)
+				play_button.setTextureRect(IntRect(20, 20, 20, 20));
+			else
+				play_button.setTextureRect(IntRect(20, 0, 20, 20));
 			if (is_clicked && music.getStatus() == music.Playing) {
 				music.pause();
 				is_clicked = false;
@@ -90,7 +106,12 @@ void Play_audio::control_time_stamp(RectangleShape& cursor, Music& music, bool& 
 			}
 		}
 		else
-			play_button.setTextureRect(IntRect(0, 0, 20, 20));
+		{
+			if (music.getStatus() == music.Playing)
+				play_button.setTextureRect(IntRect(0, 20, 20, 20));
+			else
+				play_button.setTextureRect(IntRect(0, 0, 20, 20));
+		}
 		if (cursor.getGlobalBounds().intersects(next_button.getGlobalBounds())) {
 			next_button.setTextureRect(IntRect(30, 0, 30, 20));
 			if (is_clicked) {
@@ -118,6 +139,16 @@ void Play_audio::control_time_stamp(RectangleShape& cursor, Music& music, bool& 
 	file_info_text.setString(file_name.substr(0, 33) + "...\nFile size: " + to_string(final_file_size / 1048576).substr(0, 4) + " Mb\nTime: " + to_string(remain_minutes) + "m " + to_string(remain_seconds) + "s");
 }
 
+void Play_audio::control_volume(RectangleShape& cursor, Music& music, SoundBuffer& soundBuffer, RenderWindow& window) {
+
+	if (window.hasFocus()) {
+		if (cursor.getGlobalBounds().intersects(volume_cover.getGlobalBounds()) && Mouse::isButtonPressed(Mouse::Left)) {
+			volume_bar.setSize(Vector2f(cursor.getPosition().x - volume_bar.getPosition().x, 74));
+			music.setVolume((cursor.getPosition().x - volume_bar.getPosition().x) * 100 / 129);
+		}
+	}
+}
+
 void Play_audio::draw(RenderWindow& window) {
 	
 	window.draw(timestamp_bar_max);
@@ -126,4 +157,6 @@ void Play_audio::draw(RenderWindow& window) {
 	window.draw(next_button);
 	window.draw(prev_button);
 	window.draw(file_info_text);
+	window.draw(volume_bar);
+	window.draw(volume_cover);
 }

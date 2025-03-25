@@ -40,11 +40,13 @@ private:
 
 	// Initialize audio properties
 	Music music;
+	SoundBuffer soundBuffer;
 
 	// Initialize UI related stuff
 	RectangleShape cursor;
 	RectangleShape caret;
 	RectangleShape search_bar_bounds;
+	RectangleShape view_bounds; // This rectangle sets the visible bounds for the found_files_vector_text
 	Font font;
 	Text search_bar_text; // This text contains the search bar string
 	vector<Text> found_files_vector_text; // This text contains each file found inside the current directory

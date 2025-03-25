@@ -1,9 +1,6 @@
 #include "Search_directory.h"
 
 Search_directory::Search_directory() {
-	view_bounds.setSize(Vector2f(995, 595));
-	view_bounds.setFillColor(Color(31, 34, 44));
-	view_bounds.setPosition(0, 45);
 
 	select_bar.setSize(Vector2f(995, 20));
 	select_bar.setFillColor(Color(255, 207, 150));
@@ -28,8 +25,7 @@ void Search_directory::search_current_directory(string& search_bar, vector<Text>
 	}
 }
 
-void Search_directory::draw(RenderWindow& window, vector<Text>& found_files_vector_text, int& scroll_value, RectangleShape& cursor) {
-	window.draw(view_bounds);
+void Search_directory::draw(RenderWindow& window, vector<Text>& found_files_vector_text, int& scroll_value, RectangleShape& cursor, RectangleShape& view_bounds) {
 	for (int i = 0; i < found_files_vector_text.size(); i++) {
 		found_files_vector_text[i].setPosition(5, 50 + (i * 27) + scroll_value * 27);
 		if (view_bounds.getGlobalBounds().intersects(found_files_vector_text[i].getGlobalBounds())) {
