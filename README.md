@@ -4,7 +4,7 @@ A simple, retro, music player that is **under development** in C++, using the SF
 - ✅ Open audio files 
 - ✅ Search directories for audio files 
 - ✅ Control playback 
-- ✅ View timestamps
+- ✅ View - Edit timestamps
 
 Simple stuff!  
 
