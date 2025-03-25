@@ -8,7 +8,7 @@ A simple, retro, music player that is **under development** in C++, using the SF
 
 Simple stuff!  
 
-![Screenshot_2](https://github.com/user-attachments/assets/dfeec2bc-3c27-47d9-8830-1260b7bc2a58)
+![Screenshot_1](https://github.com/user-attachments/assets/4c20982b-e350-4c04-99ea-84b2ea7382a7)
 
 ---
 
