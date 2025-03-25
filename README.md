@@ -13,10 +13,16 @@ Simple stuff!
 ---
 
 ## 💁 How to use:
-1. **Type a directory in the top menu and press enter.**
-2. **Select the audio file you want to play with your mouse.**
-3. **Use the arrow keys or mouse wheel to go up-down the track list**
-4. **Use the symbols to control playback.**
+- **Open audio file manually:**
+  1. **Type a directory in the top menu and press enter.**
+  2. **Select the audio file you want to play with your mouse.**
+  3. **Use the mouse wheel to go up-down the track list**
+  4. **Use the symbols to control playback and volume.**
+- **Set as default audio player:**
+  1. **Right click on a audio file.**
+  2. **Choose open as...**
+  3. **Find and select "Da music player revamped.exe"**
+  4. **Click "Always".**
 
 ---
 
