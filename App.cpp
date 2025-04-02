@@ -11,6 +11,7 @@ App::App(int argc, char* argv[]) {
 
 	// Initialize window and its properties
 	window.create(VideoMode(995, 770), version, Style::Close);
+	window.setFramerateLimit(60);
 	window_icon.loadFromFile((assets_path / "Textures/logo.png").string());
 	window.setIcon(window_icon.getSize().x, window_icon.getSize().y, window_icon.getPixelsPtr());
 
