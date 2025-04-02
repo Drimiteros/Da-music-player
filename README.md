@@ -1,4 +1,4 @@
-# Da Music Player v.3.3 (revamped) 🎵  
+# Da Music Player (revamped) 🎵  
 
 A simple, retro, music player for the **Windows OP**. It is **under development** using **C++** and the **SFML** library (for Graphics and Audio handling). It allows you to:  
 - ✅ Open audio files 
