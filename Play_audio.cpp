@@ -66,10 +66,12 @@ void Play_audio::play_audio_from_current_dir(string& search_bar, vector<Text>& f
 				if (search_bar[search_bar.size()] == '\\' && search_bar[search_bar.size()] == '/') {
 					music.openFromFile(search_bar + found_files_vector_text[i].getString());
 					soundBuffer.loadFromFile(search_bar + found_files_vector_text[i].getString());
+					current_audio = i;
 				}
 				else {
 					music.openFromFile(search_bar + "\\" + found_files_vector_text[i].getString());
 					soundBuffer.loadFromFile(search_bar + "\\" + found_files_vector_text[i].getString());
+					current_audio = i;
 				}
 				file_name = found_files_vector_text[i].getString().toAnsiString();
 				final_file_size = file_size[i];
@@ -79,18 +81,21 @@ void Play_audio::play_audio_from_current_dir(string& search_bar, vector<Text>& f
 	}
 }
 
-void Play_audio::control_time_stamp(RectangleShape& cursor, Music& music, SoundBuffer& soundBuffer, bool& is_clicked, RenderWindow& window) {
+void Play_audio::control_time_stamp(RectangleShape& cursor, Music& music, SoundBuffer& soundBuffer, bool& is_clicked, RenderWindow& window, string& search_bar, vector<Text>& found_files_vector_text,
+	vector<float>& file_size) {
 	
 	if (window.hasFocus()) {
 		timestamp_bar.setSize(Vector2f(((music.getPlayingOffset().asSeconds() * 1) / music.getDuration().asSeconds()) * 985, 20));
 
-		//When we click inside the timestamp_bar_max, we set the current progress of the audio.
-		//We dynamically calculate the audio progress based on the cursor position relative to the position and size of timestamp_bar
+		// Align audio with timestamp
+		// When we click inside the timestamp_bar_max, we set the current progress of the audio.
+		// We dynamically calculate the audio progress based on the cursor position relative to the position and size of timestamp_bar
 		if (cursor.getGlobalBounds().intersects(timestamp_bar_max.getGlobalBounds()) && Mouse::isButtonPressed(Mouse::Left)) {
 			float playing_offset = ((cursor.getPosition().x - timestamp_bar.getPosition().x) / timestamp_bar_max.getLocalBounds().width) * music.getDuration().asSeconds();
 			music.setPlayingOffset(seconds(playing_offset));
 		}
 
+		// Play - Pause audio
 		if (cursor.getGlobalBounds().intersects(play_button.getGlobalBounds())) {
 			if (music.getStatus() == music.Playing)
 				play_button.setTextureRect(IntRect(20, 20, 20, 20));
@@ -112,11 +117,23 @@ void Play_audio::control_time_stamp(RectangleShape& cursor, Music& music, SoundB
 			else
 				play_button.setTextureRect(IntRect(0, 0, 20, 20));
 		}
+
+		// Skip - Return to audio
 		if (cursor.getGlobalBounds().intersects(next_button.getGlobalBounds())) {
 			next_button.setTextureRect(IntRect(30, 0, 30, 20));
-			if (is_clicked) {
-				music_offset = music.getPlayingOffset().asSeconds() + 5;
-				music.setPlayingOffset(seconds(music_offset));
+			if (is_clicked && current_audio + 1 <= found_files_vector_text.size()) {
+				current_audio++;
+				if (search_bar[search_bar.size()] == '\\' && search_bar[search_bar.size()] == '/') {
+					music.openFromFile(search_bar + found_files_vector_text[current_audio].getString());
+					soundBuffer.loadFromFile(search_bar + found_files_vector_text[current_audio].getString());
+				}
+				else {
+					music.openFromFile(search_bar + "\\" + found_files_vector_text[current_audio].getString());
+					soundBuffer.loadFromFile(search_bar + "\\" + found_files_vector_text[current_audio].getString());
+				}
+				file_name = found_files_vector_text[current_audio].getString().toAnsiString();
+				final_file_size = file_size[current_audio];
+				music.play();
 				is_clicked = false;
 			}
 		}
@@ -124,9 +141,19 @@ void Play_audio::control_time_stamp(RectangleShape& cursor, Music& music, SoundB
 			next_button.setTextureRect(IntRect(0, 0, 30, 20));
 		if (cursor.getGlobalBounds().intersects(prev_button.getGlobalBounds())) {
 			prev_button.setTextureRect(IntRect(0, 0, 30, 20));
-			if (is_clicked) {
-				music_offset = music.getPlayingOffset().asSeconds() - 5;
-				music.setPlayingOffset(seconds(music_offset));
+			if (is_clicked && current_audio - 1 >= 0) {
+				current_audio--;
+				if (search_bar[search_bar.size()] == '\\' && search_bar[search_bar.size()] == '/') {
+					music.openFromFile(search_bar + found_files_vector_text[current_audio].getString());
+					soundBuffer.loadFromFile(search_bar + found_files_vector_text[current_audio].getString());
+				}
+				else {
+					music.openFromFile(search_bar + "\\" + found_files_vector_text[current_audio].getString());
+					soundBuffer.loadFromFile(search_bar + "\\" + found_files_vector_text[current_audio].getString());
+				}
+				file_name = found_files_vector_text[current_audio].getString().toAnsiString();
+				final_file_size = file_size[current_audio];
+				music.play();
 				is_clicked = false;
 			}
 		}

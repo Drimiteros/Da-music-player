@@ -26,7 +26,7 @@ private:
 	filesystem::path passed_audio_from_args;
 
 	// INITIALIZE WINDOW, PROPERTIES AND EVENTS
-	string version = "Da Music Player v.3.3_2 (revamped)";
+	string version = "Da Music Player v.3.4 (revamped)";
 	RenderWindow window;
 	Event event;
 	Image window_icon;

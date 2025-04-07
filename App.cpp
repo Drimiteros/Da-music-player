@@ -74,7 +74,7 @@ void App::update() {
 	// Play sound that was passed from cmd arguments
 	play_audio.play_audio_from_args(has_passed, passed_audio_from_args, music, soundBuffer);
 	play_audio.play_audio_from_current_dir(search_bar, found_files_vector_text, cursor, music, soundBuffer, file_size, window, view_bounds);
-	play_audio.control_time_stamp(cursor, music, soundBuffer, is_clicked, window);
+	play_audio.control_time_stamp(cursor, music, soundBuffer, is_clicked, window, search_bar, found_files_vector_text, file_size);
 	play_audio.control_volume(cursor, music, soundBuffer, window);
 
 	// Set the string for search bar and update caret

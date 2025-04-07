@@ -31,6 +31,7 @@ private:
 	int final_file_size;
 	int remain_minutes;
 	int remain_seconds;
+	int current_audio;
 	float music_offset;
 
 public:
@@ -39,7 +40,8 @@ public:
 	void play_audio_from_args(bool& has_passed, filesystem::path& passed_audio_from_args, Music& music, SoundBuffer& soundBuffer);
 	void play_audio_from_current_dir(string& search_bar, vector<Text>& found_files_vector_text, RectangleShape& cursor, Music& music, SoundBuffer& soundBuffer, vector<float>& file_size, 
 		RenderWindow& window, RectangleShape& view_bounds);
-	void control_time_stamp(RectangleShape& cursor, Music& music, SoundBuffer& soundBuffer, bool& is_clicked, RenderWindow& window);
+	void control_time_stamp(RectangleShape& cursor, Music& music, SoundBuffer& soundBuffer, bool& is_clicked, RenderWindow& window, string& search_bar, vector<Text>& found_files_vector_text, 
+		vector<float>& file_size);
 	void control_volume(RectangleShape& cursor, Music& music, SoundBuffer& soundBuffer, RenderWindow& window);
 	void draw(RenderWindow& window);
 };
