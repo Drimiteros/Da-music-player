@@ -4,14 +4,14 @@ Keyboard_mouse_events::Keyboard_mouse_events() {
 
 }
 
-void Keyboard_mouse_events::get_keyboard_input(Event& event, string& search_bar, bool& finished, RenderWindow& window) {
+void Keyboard_mouse_events::get_keyboard_input(Event& event, wstring& search_bar_wstring, bool& finished, RenderWindow& window) {
 
 	if (window.hasFocus()) {
-		if (event.type == Event::TextEntered && !Keyboard::isKeyPressed(Keyboard::Enter) && !Keyboard::isKeyPressed(Keyboard::BackSpace))
-			search_bar += event.text.unicode;
-		if (event.type == Event::TextEntered && !Keyboard::isKeyPressed(Keyboard::Enter) && Keyboard::isKeyPressed(Keyboard::BackSpace))
-			search_bar = search_bar.substr(0, search_bar.size() - 1);
-		if (event.type == Event::TextEntered && Keyboard::isKeyPressed(Keyboard::Enter) && !Keyboard::isKeyPressed(Keyboard::BackSpace))
+		if (event.type == Event::TextEntered && !Keyboard::isKeyPressed(Keyboard::Enter) && !Keyboard::isKeyPressed(Keyboard::BackSpace) && !Keyboard::isKeyPressed(Keyboard::Escape))
+			search_bar_wstring += event.text.unicode;
+		if (event.type == Event::TextEntered && !Keyboard::isKeyPressed(Keyboard::Enter) && Keyboard::isKeyPressed(Keyboard::BackSpace) && !Keyboard::isKeyPressed(Keyboard::Escape))
+			search_bar_wstring = search_bar_wstring.substr(0, search_bar_wstring.size() - 1);
+		if (event.type == Event::TextEntered && Keyboard::isKeyPressed(Keyboard::Enter) && !Keyboard::isKeyPressed(Keyboard::BackSpace) && !Keyboard::isKeyPressed(Keyboard::Escape))
 			finished = false;
 	}
 }

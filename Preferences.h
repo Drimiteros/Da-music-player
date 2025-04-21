@@ -11,7 +11,7 @@ private:
 
 public:
 	Preferences();
-	void load_latest_path(filesystem::path& assest_path, string& search_bar);
-	void save_latest_path(filesystem::path& assest_path, string& search_bar);
+	void load_preferences(filesystem::path& assest_path, wstring& search_bar_wstring, int& theme, bool& performance_mode, bool& view_waveform);
+	void save_preferences(filesystem::path& assest_path, wstring& search_bar_wstring, int& theme, bool& performance_mode, bool& view_waveform);
 };
 

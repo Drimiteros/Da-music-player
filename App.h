@@ -9,6 +9,7 @@
 #include "keyboard_mouse_events.h"
 #include "Search_directory.h"
 #include "Waveform.h"
+#include "Menu_bar.h"
 
 using namespace std;
 using namespace sf;
@@ -26,23 +27,29 @@ private:
 	filesystem::path passed_audio_from_args;
 
 	// INITIALIZE WINDOW, PROPERTIES AND EVENTS
-	string version = "Da Music Player v.3.4 (revamped)";
-	RenderWindow window;
-	Event event;
-	Image window_icon;
-	string search_bar;
+	int width = 995;
+	int height = 810;
+	int scroll_value = 0; // The value holds the scroll value of the mouse wheel
+	vector<float> file_size;
 	bool finished = false; // Returns true after a successful iteration of all the files inside a directory
 	bool has_passed = false; // Returns true if the app has passed cmd arguments
 	bool is_clicked = false; // Returns true if the left mouse click is pressed
-	int scroll_value = 0; // The value holds the scroll value of the mouse wheel
-	vector<float> file_size;
+	bool performance_mode = false;
+	bool is_options_menu_open = false;
+	bool is_about_menu_open = false;
+	bool view_waveform = true;
+	string version = "Da Music Player v.4.0 (revamped)";
+	RenderWindow window;
+	Event event;
+	Image window_icon;
+	wstring search_bar_wstring;
 	Clock clock; // This updates the blinking rate of the caret
 
 	// Initialize audio properties
 	Music music;
 	SoundBuffer soundBuffer;
 
-	// Initialize UI related stuff
+	// Initialize general UI related stuff
 	RectangleShape cursor;
 	RectangleShape caret;
 	RectangleShape search_bar_bounds;
@@ -51,6 +58,27 @@ private:
 	Text search_bar_text; // This text contains the search bar string
 	vector<Text> found_files_vector_text; // This text contains each file found inside the current directory
 	Text found_files_text; // This text is used to set the properties of found_files_vector_text before the pushBack
+	
+	// Themes
+	int theme = 0;
+	float background_color[4][3] = { 
+		{ 61, 64, 74 },
+		{ 150, 95, 4 },
+		{ 4, 95, 150 },
+		{ 4, 150, 95 }
+	};
+	float bounds_color[4][3] = {
+		{ 31, 34, 44 },
+		{ 60, 42,  2 },
+		{ 23, 45, 95 },
+		{ 23, 95, 45 }
+	};
+	float text_color[4][3] = {
+		{ 161, 164, 174 },
+		{ 250, 195, 134 },
+		{ 134, 195, 250 },
+		{ 134, 250, 195 }
+	};
 
 public:
 	// Init classes
@@ -59,6 +87,7 @@ public:
 	Keyboard_mouse_events keyboard_mouse_events;
 	Search_directory search_directory;
 	Waveform waveform;
+	Menu_bar menu_bar;
 
 	App(int argc, char* argv[]);
 

@@ -5,6 +5,7 @@
 
 using namespace std;
 using namespace sf;
+namespace fs = std::filesystem;
 
 class Get_cmd_arguments
 {

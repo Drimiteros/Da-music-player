@@ -6,15 +6,15 @@ Search_directory::Search_directory() {
 	select_bar.setFillColor(Color(255, 207, 150));
 }
 
-void Search_directory::search_current_directory(string& search_bar, vector<Text>& found_files_vector_text, Text& found_files_text, bool& finished, vector<float>& file_size) {
+void Search_directory::search_current_directory(wstring& search_bar_wstring, vector<Text>& found_files_vector_text, Text& found_files_text, bool& finished, vector<float>& file_size) {
 	if (!finished) {
 		found_files_vector_text.clear();
 		try {
-			for (const auto& entry : filesystem::directory_iterator(search_bar)) {
-				string file_name = entry.path().filename().string();
+			for (const auto& entry : filesystem::directory_iterator(search_bar_wstring)) {
+				wstring file_name = entry.path().filename();
 				found_files_text.setString(file_name);
 				found_files_vector_text.push_back(found_files_text);
-				file_size.push_back(entry.file_size());
+				file_size.emplace_back(entry.file_size());
 			}
 			finished = true;
 		}
@@ -25,11 +25,11 @@ void Search_directory::search_current_directory(string& search_bar, vector<Text>
 	}
 }
 
-void Search_directory::draw(RenderWindow& window, vector<Text>& found_files_vector_text, int& scroll_value, RectangleShape& cursor, RectangleShape& view_bounds) {
+void Search_directory::draw(RenderWindow& window, vector<Text>& found_files_vector_text, int& scroll_value, RectangleShape& cursor, RectangleShape& view_bounds, bool is_options_menu_open) {
 	for (int i = 0; i < found_files_vector_text.size(); i++) {
 		found_files_vector_text[i].setPosition(5, 50 + (i * 27) + scroll_value * 27);
 		if (view_bounds.getGlobalBounds().intersects(found_files_vector_text[i].getGlobalBounds())) {
-			if (cursor.getGlobalBounds().intersects(found_files_vector_text[i].getGlobalBounds())) {
+			if (cursor.getGlobalBounds().intersects(found_files_vector_text[i].getGlobalBounds()) && window.hasFocus() && !is_options_menu_open) {
 				window.draw(select_bar);
 				select_bar.setPosition(found_files_vector_text[i].getPosition().x - 5, found_files_vector_text[i].getPosition().y - 1);
 				found_files_vector_text[i].setFillColor(Color::Black);

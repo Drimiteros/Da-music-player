@@ -1,1 +1,4 @@
-latest directory: d:/music/da music playlist
+latest directory: c:/music
+theme: 1
+performance mode: 1
+waveform: 1

@@ -23,7 +23,7 @@ private:
 
 public:
     Waveform();
-    void waveform_logic(Music& music, SoundBuffer& soundBuffer);
-    void draw(RenderWindow& window);
+    void waveform_logic(Music& music, SoundBuffer& soundBuffer, int theme, float background_color[4][3], bool& view_waveform);
+    void draw(RenderWindow& window, bool& view_waveform);
 };
 
